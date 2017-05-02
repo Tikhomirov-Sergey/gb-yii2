@@ -7,7 +7,9 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
+use app\models\RegistrationForm;
 use app\models\ContactForm;
+use app\models\User;
 use yii\db\Query;
 
 class SiteController extends Controller
@@ -79,7 +81,29 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }
+       
         return $this->render('login', [
+            'model' => $model,
+        ]);
+    }
+    
+    /**
+     * Registration action.
+     *
+     * @return string
+     */
+    public function actionRegistration()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new User();
+        if ($model->load(Yii::$app->request->post()) && $model->registration()) {
+            return $this->goBack();
+        }
+       
+        return $this->render('registration', [
             'model' => $model,
         ]);
     }

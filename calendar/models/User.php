@@ -21,9 +21,14 @@ use Yii;
  */
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
-    public $username;
     public $authKey;
     public $accessToken;
+    
+    //public $login;
+    //public $password;
+    //public $email;
+
+    private $_user = false;
     
     public function behaviors()
     {
@@ -52,11 +57,12 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['login', 'email','created_at'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['login', 'email'], 'required'],
+            ['email', 'email'],
             [['login'], 'string', 'max' => 30],
             [['email'], 'string', 'max' => 40],
             [['password'], 'string', 'max' => 100],
+            ['login', 'validateLogin'],
         ];
     }
 
@@ -170,5 +176,29 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public function validateAuthKey($authKey)
     {
         return $this->authKey === $authKey;
+    }
+    
+    public function registration()
+    {
+        if ($this->validate()) {
+             
+            $model = new User();
+           
+            if ($model->load(Yii::$app->request->post()) && $model->save()){
+                Yii::$app->user->login($model,0);
+                return true; 
+            }
+            
+            return false;
+       }
+    }
+    
+    public function validateLogin($attribute, $params)
+    {
+            $this->_user = User::findByUsername($this->login);
+            
+            if (!$this->_user === false) {
+                $this->addError($attribute, 'Введенный логин уже используется');
+            }
     }
 }

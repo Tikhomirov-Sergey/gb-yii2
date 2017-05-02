@@ -26,8 +26,11 @@ AppAsset::register($this);
 
 <div class="wrap">
     <?php
+    
+    $isGuest = Yii::$app->user->isGuest;
+    
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => 'Calendar',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -39,16 +42,16 @@ AppAsset::register($this);
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
-            ['label' => 'CRUD User', 'url' => ['/user']],
-            ['label' => 'CRUD Event', 'url' => ['/event']],
-            ['label' => 'CRUD Link', 'url' => ['/link']],
-            Yii::$app->user->isGuest ? (
+            ['label' => 'CRUD User', 'url' => ['/user'], 'visible' => !$isGuest],
+            ['label' => 'CRUD Event', 'url' => ['/event'], 'visible' => !$isGuest],
+            ['label' => 'CRUD Link', 'url' => ['/link'], 'visible' => !$isGuest],
+            $isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
                 . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    Yii::$app->user->identity->login,
                     ['class' => 'btn btn-link logout']
                 )
                 . Html::endForm()
@@ -69,7 +72,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; Calendar <?= date('Y') ?></p>
 
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
